@@ -1,0 +1,55 @@
+import yfinance as yf
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score
+from sklearn.model_selection import train_test_split, GridSearchCV
+
+# Fetch historical data for the S&P 500
+sp500 = yf.Ticker("^GSPC")
+sp500_data = sp500.history(period="max")
+
+# Filter data for the year 2000 and onwards
+sp500_data = sp500_data.loc["2009-01-01":]
+
+# Remove unnecessary columns from the DataFrame
+sp500_data = sp500_data.drop(columns=["Dividends", "Stock Splits"])
+
+# Create a new column "Tomorrow" with closing prices shifted by one day
+sp500_data["Tomorrow"] = sp500_data["Close"].shift(-1)
+
+# Adding a binary target variable 'Target' indicating price increase (1) or not (0)
+sp500_data["Target"] = (sp500_data["Tomorrow"] > sp500_data["Close"]).astype(int)
+
+# Assuming "Target" is the column you want to predict
+X = sp500_data[["Close", "Volume", "Open", "High", "Low"]]
+y = sp500_data["Target"]
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Create and fit the model with hyperparameter tuning using GridSearchCV
+param_grid = {
+    'n_estimators': [10, 20],
+    'max_depth': [20, 10,],
+    'min_samples_split': [2, 5,],
+    'min_samples_leaf': [2, 4]
+}
+
+grid_search = GridSearchCV(RandomForestClassifier(random_state=1), param_grid, cv=5, scoring='accuracy')
+grid_search.fit(X_train, y_train)
+
+# Print the best hyperparameters found by GridSearchCV
+print("Best Hyperparameters:", grid_search.best_params_)
+
+# Use the best model for predictions
+best_model = grid_search.best_estimator_
+y_pred = best_model.predict(X_test)
+
+# Calculate accuracy and precision
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+
+# Print accuracy and precision
+print("Accuracy:", accuracy)
+print("Precision:", precision)
