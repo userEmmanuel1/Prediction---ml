@@ -1,6 +1,8 @@
 import yfinance as yf
 import matplotlib.pyplot as plt
 import pandas as pd
+import Time 
+from Time import Sleep
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -8,6 +10,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 # Fetch historical data for the S&P 500
 sp500 = yf.Ticker("^GSPC")
 sp500_data = sp500.history(period="max")
+start_time=time.time
 
 # Filter data for the year 2000 and onwards
 sp500_data = sp500_data.loc["2009-01-01":]
@@ -53,3 +56,8 @@ precision = precision_score(y_test, y_pred)
 # Print accuracy and precision
 print("Accuracy:", accuracy)
 print("Precision:", precision)
+end_time=time.time
+run_time = end_time-start.time
+
+###TEST INDIVIDUAL BLOCKS
+print(f"TOTAL TIME TO RUN IS : " {run_time})
