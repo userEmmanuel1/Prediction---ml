@@ -87,3 +87,14 @@ print(model.predict(yesterdays_values))
 #Predicted: 4698.58675283
 #Actual Price 4839.81
 #Difference 141.22324717
+
+
+from sklearn.tree import export_graphviz
+from sklearn import tree
+
+
+print (tree.export_graphviz(clf.estimators_[0]))
+
+#Copy and paste the code here to view your tree
+#https://dreampuf.github.io/GraphvizOnline/
+
